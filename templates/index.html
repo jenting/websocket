@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Example</title>
+</head>
+<body>
+    <button id="downloadButton">Download Repo</button>
+    <input type="text" id="repoInput" placeholder="Enter Git repo URL">
+    <div id="responseDiv"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            console.log('Connected to WebSocket');
+        });
+
+        document.getElementById('downloadButton').addEventListener('click', function() {
+            var repoUrl = document.getElementById('repoInput').value;
+            socket.emit('download_repo', repoUrl);
+        });
+
+        socket.on('repo_url', function(response) {
+            var responseDiv = document.getElementById('responseDiv');
+            responseDiv.innerHTML += response + '<br>'; // Append the response with a line break
+
+            // Scroll to the bottom of the div to show the latest message
+            responseDiv.scrollTop = responseDiv.scrollHeight;
+        });
+
+        socket.on('repo_error', function(error) {
+            var responseDiv = document.getElementById('responseDiv');
+            responseDiv.innerHTML = '<span style="color: red;">' + error + '</span>';
+        });
+    </script>
+</body>
+</html>
